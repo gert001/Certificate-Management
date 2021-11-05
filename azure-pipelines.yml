@@ -20,7 +20,7 @@ steps:
 - script: | 
     GeneratedPassword=$(openssl rand -base64 14)
     echo $GeneratedPassword
-    echo "##vso[task.setvariable variable=GeneratedPassword;isOutput=true]$GeneratedPassword"
+    echo "##vso[task.setvariable variable=GeneratedPassword]$GeneratedPassword"
     openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}" -passout pass:$GeneratedPassword
     pwd
    
@@ -30,12 +30,11 @@ steps:
 #Next Steps
 ## import .key and GeneratedPassword into Keyvault.
 - task: AzureCLI@2
-  displayName: Set Secret in Keyvault
   inputs:
     azureSubscription: 'GSPipelines'
-    scriptType: 'bash'
+    scriptType: 'pscore'
     scriptLocation: 'inlineScript'
-    inlineScript: az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}
+    inlineScript: 'az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}'
 
 - task: PublishBuildArtifacts@1
   inputs:
@@ -45,5 +44,4 @@ steps:
     #targetPath: # Required when publishLocation == FilePath
     #parallel: false # Optional
     #parallelCount: # Optional
-  
   displayName: 'Run a one-line script'
