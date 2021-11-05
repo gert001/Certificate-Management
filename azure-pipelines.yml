@@ -43,8 +43,7 @@ steps:
     azureSubscription: 'GSPipelines'
     scriptType: 'pscore'
     scriptLocation: 'inlineScript'
-    inlineScript: 'az keyvault secret set --name ${{parameters.DNS_Name}}-pkey-password --vault-name ${{parameters.Keyvault}} --value [Generating_CSR_and_Private_Key_and_install_azure_cli]_[GlobalGeneratedPassword]'
-
+    inlineScript: 'az keyvault secret set --name ${{parameters.DNS_Name}}-pkey-password --vault-name ${{parameters.Keyvault}} --value  $(Generating_CSR_and_Private_Key_and_install_azure_cli.GlobalGeneratedPassword) '
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)' 
