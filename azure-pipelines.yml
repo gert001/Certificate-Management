@@ -36,7 +36,8 @@ steps:
    
   
 #Next Steps
-## import .key and GeneratedPassword into Keyvault.
+## import .key into Keyvault.
+## Sign 
 
 - task: AzureCLI@2
   inputs:
@@ -52,17 +53,25 @@ steps:
     SecretsFilter: '${{parameters.DNS_Name}}-pkey-password'
     RunAsPreJob: false
   
-
-
 - task: Bash@3
   name: Private_key_Verification
 
   inputs:
     targetType: 'inline'
     script: |
-        openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password)
-
+        privatekeyvalue =  $(openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password) )
+        echo "##vso[task.setvariable variable=privatekeyvalue;isOutput=true]$privatekeyvalue"
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
+
+- task: AzureCLI@2
+  name: Store_key_in_KeyVault
+  inputs:
+    azureSubscription: 'GSPipelines'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az keyvault key import --byok-string $(Private_key_Verification.privatekeyvalue) --kty rsa --name ${{parameters.DNS_Name}} --vault-name ${{parameters.Keyvault}}'
+
+
 
 
 - task: PublishBuildArtifacts@1
