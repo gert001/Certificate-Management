@@ -51,6 +51,19 @@ steps:
     KeyVaultName: 'certsecretmanagement'
     SecretsFilter: '${{parameters.DNS_Name}}-pkey-password'
     RunAsPreJob: false
+  
+
+
+- task: Bash@3
+  name: Private_key_Verification
+
+  inputs:
+    targetType: 'inline'
+    script: |
+        openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password)
+
+    workingDirectory: '$(Build.ArtifactStagingDirectory)' 
+
 
 - task: PublishBuildArtifacts@1
   inputs:
