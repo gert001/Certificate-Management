@@ -23,7 +23,6 @@ steps:
     echo "##vso[task.setvariable variable=GeneratedPassword;isOutput=true]$GeneratedPassword"
     openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}" -passout pass:$GeneratedPassword
     pwd
-    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
    
   workingDirectory: '$(Build.ArtifactStagingDirectory)' 
   displayName: Generating CSR and Private Key and install azure cli
@@ -36,7 +35,7 @@ steps:
     azureSubscription: 'GSPipelines'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
-    inlineScript: 'az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}'
+    inlineScript: az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}
 
 - task: PublishBuildArtifacts@1
   inputs:
