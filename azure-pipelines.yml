@@ -34,7 +34,7 @@ steps:
   displayName: Set Secret in Keyvault
   inputs:
     azureSubscription: 'GSPipelines'
-    scriptType: 'ps'
+    scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 'az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}'
 
