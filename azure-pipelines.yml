@@ -30,6 +30,7 @@ steps:
         echo $GeneratedPassword
         echo "##vso[task.setvariable variable=GlobalGeneratedPassword;isOutput=true]$GeneratedPassword"
         openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}" -passout pass:$GeneratedPassword
+        echo ${GlobalGeneratedPassword}
 
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
    # failOnStderr: true
