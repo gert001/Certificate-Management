@@ -20,22 +20,22 @@ steps:
 - script: | 
     GeneratedPassword=$(openssl rand -base64 14)
     echo $GeneratedPassword
+    echo "##vso[task.setvariable variable=GeneratedPassword;isOutput=true]$GeneratedPassword"
     openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}" -passout pass:$GeneratedPassword
     pwd
-    "##vso[task.setvariable variable=GeneratedPassword]$GeneratedPassword"
+   
   workingDirectory: '$(Build.ArtifactStagingDirectory)' 
   displayName: Generating CSR and Private Key
   
 #Next Steps
 ## import .key and GeneratedPassword into Keyvault.
 - task: AzureCLI@2
-  displayName: Set Secret in keyvault
+  displayName: Set Secret in Keyvault
   inputs:
     azureSubscription: 'GSPipelines'
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
-    inlineScript: |
-      az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}
+    inlineScript: 'az keyvault secret set --name MySecretName --vault-name MyKeyVault --value ${{variables.GeneratedPassword}}'
 
 - task: PublishBuildArtifacts@1
   inputs:
