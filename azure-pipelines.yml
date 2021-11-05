@@ -17,7 +17,6 @@ parameters:
 
 variables:
   - name: GlobalGeneratedPassword
-#    value: "Testvalue"
 
 steps:
 
@@ -30,9 +29,7 @@ steps:
         GeneratedPassword=$(openssl rand -base64 14)
         echo $GeneratedPassword
         echo "##vso[task.setvariable variable=GlobalGeneratedPassword;isOutput=true]$GeneratedPassword"
-        echo $?
         openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}" -passout pass:$GeneratedPassword
-        echo "generated Password for Pipeline Variable" ${GeneratedPassword}
 
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
    # failOnStderr: true
@@ -41,19 +38,19 @@ steps:
 #Next Steps
 ## import .key and GeneratedPassword into Keyvault.
 
-#- task: AzureCLI@2
- # inputs:
-  #  azureSubscription: 'GSPipelines'
-   # scriptType: 'pscore'
-    #scriptLocation: 'inlineScript'
-    #inlineScript: 'az keyvault secret set --name ${{parameters.DNS_Name}}-pkey-password --vault-name ${{parameters.Keyvault}} --value ${{variables.GeneratedPassword}}'
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'GSPipelines'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az keyvault secret set --name ${{parameters.DNS_Name}}-pkey-password --vault-name ${{parameters.Keyvault}} --value ${GlobalGeneratedPassword}'
 
-#- task: PublishBuildArtifacts@1
-#  inputs:
-#    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
-#    artifactName: 'Certificate' 
-#    publishLocation: 'Container'
-#    #targetPath: # Required when publishLocation == FilePath
-#    #parallel: false # Optional
-#    #parallelCount: # Optional
-#  displayName: 'Run a one-line script'
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'Certificate' 
+    publishLocation: 'Container'
+    #targetPath: # Required when publishLocation == FilePath
+    #parallel: false # Optional
+    #parallelCount: # Optional
+  displayName: 'Run a one-line script'
