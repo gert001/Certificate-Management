@@ -26,6 +26,7 @@ steps:
 #Next Steps
 ## import .key and GeneratedPassword into Keyvault.
 - task: AzureCLI@2
+  displayName: Set Secret in keyvault
   inputs:
     azureSubscription: 'GSPipelines'
     scriptType: 'ps'
