@@ -59,8 +59,8 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-        privatekeyvalue=$(openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password))
-        echo "##vso[task.setvariable variable=privatekeyvalue;isOutput=true]'$privatekeyvalue'"
+        Globalprivatekeyvalue="$(openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password))"
+        echo "##vso[task.setvariable variable=privatekeyvalue;isOutput=true]'$Globalprivatekeyvalue'"
         echo "the value of the private key is $(Private_key_Verification.privatekeyvalue)"
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
 
@@ -70,7 +70,7 @@ steps:
     azureSubscription: 'GSPipelines'
     scriptType: 'pscore'
     scriptLocation: 'inlineScript'
-    inlineScript: 'az keyvault key import --byok-string $(Private_key_Verification.privatekeyvalue) --kty rsa --name ${{parameters.DNS_Name}} --vault-name ${{parameters.Keyvault}}'
+    inlineScript: 'az keyvault key import --byok-string "$(openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password)" --kty rsa --name ${{parameters.DNS_Name}} --vault-name ${{parameters.Keyvault}}'
 
 
 
