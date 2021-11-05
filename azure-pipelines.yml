@@ -14,8 +14,12 @@ parameters:
     default: 'env-dnsname'
 
 steps:
-- script: openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}"
-  displayName: 'Run a one-line script'
+- script: | 
+    GeneratedPassword=$(openssl rand -base64 14)
+    echo $GeneratedPassword
+    openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}} -pass $GeneratedPassword"
+  displayName: Generating CSR
+  
 
 - task: PublishBuildArtifacts@1
   inputs:
@@ -25,4 +29,5 @@ steps:
     #targetPath: # Required when publishLocation == FilePath
     #parallel: false # Optional
     #parallelCount: # Optional
-    #fileCopyOptions: #Optional
+  
+  displayName: 'Run a one-line script'
