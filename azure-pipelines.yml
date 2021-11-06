@@ -28,7 +28,7 @@ steps:
      $defaultJsonPolicy.x509CertificateProperties.subject = '/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}'
      $customJsonPolicy = defaultJsonPolicy | convertto-json
      az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy $customJsonPolicy
-  workingDirectory: '$(Build.ArtifactStagingDirectory)' 
+  
 
 
 - task: AzureKeyVault@2
