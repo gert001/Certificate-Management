@@ -26,25 +26,16 @@ steps:
     inlineScript: |
      $defaultJsonPolicy = az keyvault certificate get-default-policy | convertfrom-json
      $defaultJsonPolicy.x509CertificateProperties.subject = '/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}'
-     $customJsonPolicy = defaultJsonPolicy | convertto-json
+     $customJsonPolicy = $defaultJsonPolicy | convertto-json
      az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy $customJsonPolicy
   
 
-
-- task: AzureKeyVault@2
-  inputs:
-    azureSubscription: 'GSPipelines'
-    KeyVaultName: 'certsecretmanagement'
-    SecretsFilter: '${{parameters.DNS_Name}}-pkey-password'
-    RunAsPreJob: false
-
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'Certificate' 
-    publishLocation: 'Container'
-    #targetPath: # Required when publishLocation == FilePath
-    #parallel: false # Optional
-    #parallelCount: # Optional
-  displayName: 'Run a one-line script'
+#- task: PublishBuildArtifacts@1
+#  inputs:
+#    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
+#    artifactName: 'Certificate' 
+#    publishLocation: 'Container'
+#    #targetPath: # Required when publishLocation == FilePath
+#    #parallel: false # Optional
+#    #parallelCount: # Optional
+#  displayName: 'Run a one-line script'
