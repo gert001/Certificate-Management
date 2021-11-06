@@ -26,11 +26,11 @@ steps:
     inlineScript: |
      az keyvault certificate get-default-policy
      $defaultJsonPolicy = az keyvault certificate get-default-policy | convertfrom-json
-     $defaultJsonPolicy.x509CertificateProperties.subject = '"/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology"/CN=${{parameters.DNS_Name}}'
+     $defaultJsonPolicy.x509CertificateProperties.subject = '/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}'
      write-host "this is it before converting to JSON: "$defaultJsonPolicy.x509CertificateProperties.subject
-     $customJsonPolicy = $defaultJsonPolicy | convertto-json
+     $customJsonPolicy = $defaultJsonPolicy | convertto-json | out-file customJsonFile.json
      write-host "This is after:" $customJsonPolicy
-     az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy $customJsonPolicy
+     az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy .\customJsonFile.json
   
 
 #- task: PublishBuildArtifacts@1
