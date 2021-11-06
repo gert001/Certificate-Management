@@ -16,9 +16,6 @@ parameters:
     default: 'certsecretmanagement'
 
 
-variables:
-  - name: PrivateKeyString
-
 steps:
 
 - task: Bash@3
@@ -62,8 +59,8 @@ steps:
     targetType: 'inline'
     script: |
         openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password) -out secret.key
-        echo "##vso[task.setvariable variable=PrivateKeyString]$(<secret.key)"
-        echo "the value of the private key is $(PrivateKeyString)"
+        echo "##vso[task.setvariable variable=PrivateKeyString;isOutput=true]$(<secret.key)"
+        echo "the value of the private key is $(Private_key_Verification.PrivateKeyString)"
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
 
 - task: AzureCLI@2
