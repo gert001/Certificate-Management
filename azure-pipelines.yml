@@ -63,7 +63,7 @@ steps:
     script: |
         openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password) -out secret.key
         echo "##vso[task.setvariable variable=PrivateKeyString]$(<secret.key)"
-        echo "the value of the private key is $(PrivateKeyString)"
+        echo "the value of the private key is $(<secret.key)"
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
 
 - task: AzureCLI@2
