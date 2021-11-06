@@ -25,7 +25,7 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
      $defaultJsonPolicy = az keyvault certificate get-default-policy | convertfrom-json
-     $defaultJsonPolicy.x509CertificateProperties.subject = "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}"
+     $defaultJsonPolicy.x509CertificateProperties.subject = "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=$(${{parameters.DNS_Name}})"
      $customJsonPolicy = $defaultJsonPolicy | convertto-json
      az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy $customJsonPolicy
   
