@@ -1,0 +1,83 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+#trigger:
+#- main
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: DNS_Name
+    default: 'env-dnsname'
+  - name: Keyvault
+    default: 'certsecretmanagement'
+
+
+steps:
+
+- task: Bash@3
+  name: Generating_CSR_and_Private_Key_and_install_azure_cli
+
+  inputs:
+    targetType: 'inline'
+    script: |
+        GeneratedPassword=$(openssl rand -base64 14)
+        echo $GeneratedPassword
+        echo "##vso[task.setvariable variable=GlobalGeneratedPassword;isOutput=true]$GeneratedPassword"
+        openssl req -newkey rsa:2048 -keyout ${{parameters.DNS_Name}}.key -out ${{parameters.DNS_Name}}.csr -subj "/C=GB/ST=London/L=London/O=AXAXL/OU=Global Technology/CN=${{parameters.DNS_Name}}" -passout pass:$GeneratedPassword
+
+
+    workingDirectory: '$(Build.ArtifactStagingDirectory)' 
+   # failOnStderr: true
+   
+  
+#Next Steps
+## import .key into Keyvault.
+## Sign 
+
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'GSPipelines'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az keyvault secret set --name ${{parameters.DNS_Name}}-pkey-password --vault-name ${{parameters.Keyvault}} --value  $(Generating_CSR_and_Private_Key_and_install_azure_cli.GlobalGeneratedPassword) '
+
+- task: AzureKeyVault@2
+  inputs:
+    azureSubscription: 'GSPipelines'
+    KeyVaultName: 'certsecretmanagement'
+    SecretsFilter: '${{parameters.DNS_Name}}-pkey-password'
+    RunAsPreJob: false
+  
+- task: Bash@3
+  name: Private_key_Verification
+
+  inputs:
+    targetType: 'inline'
+    script: |
+        openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password) -out secret.key
+    workingDirectory: '$(Build.ArtifactStagingDirectory)' 
+
+- task: AzureCLI@2
+  name: Store_key_in_KeyVault
+  inputs:
+    azureSubscription: 'GSPipelines'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az keyvault key import --byok-file secret.key --kty rsa --name ${{parameters.DNS_Name}} --vault-name ${{parameters.Keyvault}}'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)' 
+
+
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'Certificate' 
+    publishLocation: 'Container'
+    #targetPath: # Required when publishLocation == FilePath
+    #parallel: false # Optional
+    #parallelCount: # Optional
+  displayName: 'Run a one-line script'
