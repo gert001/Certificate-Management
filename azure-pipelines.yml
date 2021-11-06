@@ -67,7 +67,7 @@ steps:
     azureSubscription: 'GSPipelines'
     scriptType: 'pscore'
     scriptLocation: 'inlineScript'
-    inlineScript: 'az keyvault key import --byok-file .\secret.key --kty rsa --name ${{parameters.DNS_Name}} --vault-name ${{parameters.Keyvault}}'
+    inlineScript: 'az keyvault key import --byok-file secret.key --kty rsa --name ${{parameters.DNS_Name}} --vault-name ${{parameters.Keyvault}}'
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
 
 
