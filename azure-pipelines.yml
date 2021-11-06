@@ -63,7 +63,7 @@ steps:
     script: |
         "$(openssl rsa -in ${{parameters.DNS_Name}}.key -passin pass:$(${{parameters.DNS_Name}}-pkey-password) -out secret.txt) "
         ls
-        Globalprivatekeyvalue=$(<config.txt)
+        Globalprivatekeyvalue=$(<secret.txt)
         echo "##vso[task.setvariable variable=PrivateKeyString]'$Globalprivatekeyvalue'"
         echo "the value of the private key is $(PrivateKeyString)"
     workingDirectory: '$(Build.ArtifactStagingDirectory)' 
