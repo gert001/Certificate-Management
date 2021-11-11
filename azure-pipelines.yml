@@ -24,7 +24,7 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-     $CustomPolicy = New-AzureKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
+     $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
      $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.DNS_Name}} -CertificatePolicy $CustomPolicy
      write-host "figure out sending the CSR to be signed"
 
