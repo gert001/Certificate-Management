@@ -29,7 +29,6 @@ steps:
      write-host "figure out sending the CSR to be signed"
 
 
-
 #- task: AzureCLI@2
 #  inputs:
 #    azureSubscription: 'GSPipelines'
