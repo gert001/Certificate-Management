@@ -15,8 +15,8 @@ parameters:
   - name: Keyvault
     default: 'certsecretmanagement'
 
-
 steps:
+
 
 - task: AzureCLI@2
   inputs:
@@ -24,15 +24,27 @@ steps:
     scriptType: 'ps'
     scriptLocation: 'inlineScript'
     inlineScript: |
-     $defaultJsonPolicy = az keyvault certificate get-default-policy | convertfrom-json
-     $defaultJsonPolicy.x509CertificateProperties.subject = 'C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}' 
-     $defaultJsonPolicy.lifetimeActions.action.actionType = "EmailContacts"
-     $defaultJsonPolicy.issuerParameters.name = "Unknown"
-     $defaultJsonPolicy.lifetimeActions.trigger.daysBeforeExpiry = 30
-     $defaultJsonPolicy.keyProperties.reuseKey = "False"
-     $defaultJsonPolicy.x509CertificateProperties.keyUsage = @()
-     $defaultJsonPolicy | convertto-json -depth 9| out-file -encoding utf8 customcertpolicy.json 
-     az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy `@customcertpolicy.json
+     $CustomPolicy = New-AzureKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
+     $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.DNS_Name}} -CertificatePolicy $CustomPolicy
+     write-host "figure out sending the CSR to be signed"
+
+
+
+#- task: AzureCLI@2
+#  inputs:
+#    azureSubscription: 'GSPipelines'
+#    scriptType: 'ps'
+#    scriptLocation: 'inlineScript'
+#    inlineScript: |
+#     $defaultJsonPolicy = az keyvault certificate get-default-policy | convertfrom-json
+#     $defaultJsonPolicy.x509CertificateProperties.subject = 'C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}' 
+#     $defaultJsonPolicy.lifetimeActions.action.actionType = "EmailContacts"
+#     $defaultJsonPolicy.issuerParameters.name = "Unknown"
+#     $defaultJsonPolicy.lifetimeActions.trigger.daysBeforeExpiry = 30
+#     $defaultJsonPolicy.keyProperties.reuseKey = "False"
+#     $defaultJsonPolicy.x509CertificateProperties.keyUsage = @()
+#     $defaultJsonPolicy | convertto-json -depth 9| out-file -encoding utf8 customcertpolicy.json 
+#     az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy `@customcertpolicy.json
 
 
 
