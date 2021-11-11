@@ -27,7 +27,7 @@ steps:
       $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
       $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.DNS_Name}} -CertificatePolicy $CustomPolicy
       write-host "figure out sending the CSR to be signed"
-      certreq.exe -submit -attrib "CertificateTemplate:SubCA" $customcert.CertificateSigningRequest signedrequest.csr  -config "btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA"
+      certreq.exe -submit -attrib "CertificateTemplate:SubCA" $customcert.CertificateSigningRequest signedrequest.cer  -config "btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q
     azurePowerShellVersion: 'LatestVersion'
     workingDirectory: $(Build.ArtifactStagingDirectory)
 
