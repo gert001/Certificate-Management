@@ -61,14 +61,14 @@ steps:
 
 
 
-#- task: PublishBuildArtifacts@1
-#  inputs:
-#    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
-#    artifactName: 'Certificate' 
-#    publishLocation: 'Container'
-#    #targetPath: # Required when publishLocation == FilePath
-#    #parallel: false # Optional
-#    #parallelCount: # Optional
-#  displayName: 'Run a one-line script'
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'Certificate' 
+    publishLocation: 'Container'
+    #targetPath: # Required when publishLocation == FilePath
+   #parallel: false # Optional
+    #parallelCount: # Optional
+  displayName: 'Run a one-line script'
 
 
