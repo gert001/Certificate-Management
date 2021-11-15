@@ -28,9 +28,11 @@ steps:
       $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.DNS_Name}} -CertificatePolicy $CustomPolicy
       write-host "save the CSR to be signed"
       $customcert.CertificateSigningRequest > certsignrequest.csr
-      certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
+      Invoke-AzVmRunCommand -ResourceGroupName "Cert-KeyManagement" -VMName "CA-Sign-Test" -CommandId "RunPowerShellScript" -ScriptPath "C:\Windows\System32\certreq.exe" -Parameter @{ -submit ; -attrib "CertificateTemplate:SubCA" ;  -config CA-Sign-Test\allthecerts-CA-Sign-Test-CA ; -q ; certsignrequest.csr ; signedrequest.cer }
     azurePowerShellVersion: 'LatestVersion'
     workingDirectory: $(Build.ArtifactStagingDirectory)
+
+# certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
 
 #- task: AzurePowerShell@5
 #  inputs:
