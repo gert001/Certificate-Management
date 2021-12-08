@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'Meeting-Cert3'
+    default: 'Meeting-Cert4'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -30,8 +30,7 @@ steps:
       $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.Cert_DNS_Name}} -CertificatePolicy $CustomPolicy
       write-host "save the CSR to be signed"
       $customcert.CertificateSigningRequest > certsignrequest.csr
-      ping mytestca.northeurope.cloudapp.azure.com
-      ping 10.2.0.4
+      certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://mytestca.northeurope.cloudapp.azure.com\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
 
     azurePowerShellVersion: 'LatestVersion'
     workingDirectory: $(Build.ArtifactStagingDirectory)
