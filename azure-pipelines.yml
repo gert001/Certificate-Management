@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'Finnleys_key3'
+    default: 'Finnleyskey4'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -34,43 +34,20 @@ steps:
     azurePowerShellVersion : LatestVersion
 
 
-- task: AzurePowerShell@5
-  name: 'Getting_PFX_File'
-  inputs:
-    azureSubscription: 'GSPipelines'
-    ScriptType: 'InlineScript'
-    Inline: |
-      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0 -and !$cert.Status )
-      $secret = Get-AzKeyVaultSecret -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}} -AsPlainText
-      $secretByte = [Convert]::FromBase64String($secret)
-      # Write to a file
-      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
-      write-host "FINNLEY GOT THE KEY!"
-    azurePowerShellVersion: 'LatestVersion'
-    workingDirectory: $(Build.ArtifactStagingDirectory)
-
-# certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
-# Invoke-AzVmRunCommand -ResourceGroupName "Cert-KeyManagement" -VMName "CA-Sign-Test" -CommandId "RunPowerShellScript" -ScriptPath "C:\Windows\System32\certreq.exe" -Parameter @{ -submit ; -attrib "CertificateTemplate:SubCA" ;  -config CA-Sign-Test\allthecerts-CA-Sign-Test-CA ; -q ; certsignrequest.csr ; signedrequest.cer }
-
-
-#- task: AzureCLI@2
+#- task: AzurePowerShell@5
+#  name: 'Getting_PFX_File'
 #  inputs:
 #    azureSubscription: 'GSPipelines'
-#    scriptType: 'ps'
-#    scriptLocation: 'inlineScript'
-#    inlineScript: |
-#     $defaultJsonPolicy = az keyvault certificate get-default-policy | convertfrom-json
-#     $defaultJsonPolicy.x509CertificateProperties.subject = 'C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.DNS_Name}}' 
-#     $defaultJsonPolicy.lifetimeActions.action.actionType = "EmailContacts"
-#     $defaultJsonPolicy.issuerParameters.name = "Unknown"
-#     $defaultJsonPolicy.lifetimeActions.trigger.daysBeforeExpiry = 30
-#     $defaultJsonPolicy.keyProperties.reuseKey = "False"
-#     $defaultJsonPolicy.x509CertificateProperties.keyUsage = @()
-#     $defaultJsonPolicy | convertto-json -depth 9| out-file -encoding utf8 customcertpolicy.json 
-#     az keyvault certificate create --vault-name ${{parameters.Keyvault}} --name ${{parameters.DNS_Name}} --policy `@customcertpolicy.json
-
-
-
+#    ScriptType: 'InlineScript'
+#    Inline: |
+#      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0 -and !$cert.Status )
+#      $secret = Get-AzKeyVaultSecret -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}} -AsPlainText
+#      $secretByte = [Convert]::FromBase64String($secret)
+#      # Write to a file
+#      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
+#      write-host "FINNLEY GOT THE KEY!"
+#    azurePowerShellVersion: 'LatestVersion'
+#    workingDirectory: $(Build.ArtifactStagingDirectory)
 
 
 - task: PublishBuildArtifacts@1
