@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'default-cert1'
+    default: 'FullSigntest1'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -28,10 +28,22 @@ steps:
     Inline: |
       $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.CA_DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
       $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.Cert_DNS_Name}} -CertificatePolicy $CustomPolicy
-      write-host "save the CSR to be signed"
-      $customcert.CertificateSigningRequest > certsignrequest.csr
     workingDirectory: $(Build.ArtifactStagingDirectory)
     azurePowerShellVersion : LatestVersion
+
+
+#- task: AzurePowerShell@5
+#  inputs:
+#    azureSubscription: 'GSPipelines'
+#    ScriptType: 'InlineScript'
+#    Inline: |
+#      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0)
+#      $secret = Get-AzKeyVaultSecret -VaultName $vaultName -Name $cert.Name -AsPlainText
+#      $secretByte = [Convert]::FromBase64String($secret)
+#      # Write to a file
+#      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
+#    azurePowerShellVersion: 'LatestVersion'
+#    workingDirectory: $(Build.ArtifactStagingDirectory)
 
 # certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
 # Invoke-AzVmRunCommand -ResourceGroupName "Cert-KeyManagement" -VMName "CA-Sign-Test" -CommandId "RunPowerShellScript" -ScriptPath "C:\Windows\System32\certreq.exe" -Parameter @{ -submit ; -attrib "CertificateTemplate:SubCA" ;  -config CA-Sign-Test\allthecerts-CA-Sign-Test-CA ; -q ; certsignrequest.csr ; signedrequest.cer }
@@ -66,5 +78,7 @@ steps:
    #parallel: false # Optional
     #parallelCount: # Optional
   displayName: 'Run a one-line script'
+
+
 
 
