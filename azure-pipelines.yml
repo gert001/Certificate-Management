@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'Finnleyskey4'
+    default: 'Finnleyskey5'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -21,33 +21,33 @@ steps:
 
 
 
-- task: AzurePowerShell@5
-  name: 'Generating_CSR_Request'
-  inputs:
-    azureSubscription: 'GSPipelines'
-    ScriptType: 'InlineScript'
-    Inline: |
-      $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.CA_DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
-      $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.Cert_DNS_Name}} -CertificatePolicy $CustomPolicy
-      write-host "FINNLEY WANTS A KEY!"
-    workingDirectory: $(Build.ArtifactStagingDirectory)
-    azurePowerShellVersion : LatestVersion
-
-
 #- task: AzurePowerShell@5
-#  name: 'Getting_PFX_File'
+#  name: 'Generating_CSR_Request'
 #  inputs:
 #    azureSubscription: 'GSPipelines'
 #    ScriptType: 'InlineScript'
 #    Inline: |
-#      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0 -and !$cert.Status )
-#      $secret = Get-AzKeyVaultSecret -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}} -AsPlainText
-#      $secretByte = [Convert]::FromBase64String($secret)
-#      # Write to a file
-#      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
-#      write-host "FINNLEY GOT THE KEY!"
-#    azurePowerShellVersion: 'LatestVersion'
+#      $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.CA_DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
+#      $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.Cert_DNS_Name}} -CertificatePolicy $CustomPolicy
+#      write-host "FINNLEY WANTS A KEY!"
 #    workingDirectory: $(Build.ArtifactStagingDirectory)
+#    azurePowerShellVersion : LatestVersion
+
+
+- task: AzurePowerShell@5
+  name: 'Getting_PFX_File'
+  inputs:
+    azureSubscription: 'GSPipelines'
+    ScriptType: 'InlineScript'
+    Inline: |
+      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0 -and !$cert.Status )
+      $secret = Get-AzKeyVaultSecret -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}} -AsPlainText
+      $secretByte = [Convert]::FromBase64String($secret)
+      # Write to a file
+      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
+      write-host "FINNLEY GOT THE KEY!"
+    azurePowerShellVersion: 'LatestVersion'
+    workingDirectory: $(Build.ArtifactStagingDirectory)
 
 
 - task: PublishBuildArtifacts@1
