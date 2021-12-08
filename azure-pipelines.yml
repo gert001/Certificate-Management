@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'Meeting-Cert4'
+    default: 'Meeting-Cert6'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -21,17 +21,18 @@ steps:
 
 
 
-- task: AzurePowerShell@5
-  inputs:
-    azureSubscription: 'GSPipelines'
-    ScriptType: 'InlineScript'
-    Inline: |
-      $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.CA_DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
-      $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.Cert_DNS_Name}} -CertificatePolicy $CustomPolicy
-      write-host "save the CSR to be signed"
-      $customcert.CertificateSigningRequest > certsignrequest.csr
-      certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "http://mytestca.northeurope.cloudapp.azure.com\ca-sign-test" 
-
+#- task: AzurePowerShell@5
+#  inputs:
+#    azureSubscription: 'GSPipelines'
+#    ScriptType: 'InlineScript'
+#    Inline: |
+#      $CustomPolicy = New-AzKeyVaultCertificatePolicy -SubjectName "C=GB,ST=London,L=London,O=AXAXL,OU=Global Technology,CN=${{parameters.CA_DNS_Name}}" -ValidityInMonths 12  -IssuerName Unknown -EmailAtNumberOfDaysBeforeExpiry 30
+#      $customcert = Add-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -name ${{parameters.Cert_DNS_Name}} -CertificatePolicy $CustomPolicy
+#      write-host "save the CSR to be signed"
+#      $customcert.CertificateSigningRequest > certsignrequest.csr
+#      certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "http://mytestca.northeurope.cloudapp.azure.com\ca-sign-test" 
+#    workingDirectory: $(Build.ArtifactStagingDirectory)
+#    azurePowerShellVersion : LatestVersion
 
 # certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
 #      Invoke-AzVmRunCommand -ResourceGroupName "Cert-KeyManagement" -VMName "CA-Sign-Test" -CommandId "RunPowerShellScript" -ScriptPath "C:\Windows\System32\certreq.exe" -Parameter @{ -submit ; -attrib "CertificateTemplate:SubCA" ;  -config CA-Sign-Test\allthecerts-CA-Sign-Test-CA ; -q ; certsignrequest.csr ; signedrequest.cer }
