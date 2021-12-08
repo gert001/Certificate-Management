@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'Finnleys_key2'
+    default: 'Finnleys_key3'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -40,7 +40,7 @@ steps:
     azureSubscription: 'GSPipelines'
     ScriptType: 'InlineScript'
     Inline: |
-      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0)
+      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0 -and !$cert.Status )
       $secret = Get-AzKeyVaultSecret -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}} -AsPlainText
       $secretByte = [Convert]::FromBase64String($secret)
       # Write to a file
