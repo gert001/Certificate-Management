@@ -11,7 +11,7 @@ pool:
 
 parameters:
   - name: Cert_DNS_Name
-    default: 'FullSigntest1'
+    default: 'FullSigntest2'
   - name: CA_DNS_Name
     default: 'mytestca.northeurope.cloudapp.azure.com'
   - name: Keyvault
@@ -22,6 +22,7 @@ steps:
 
 
 - task: AzurePowerShell@5
+  name: 'Generating_CSR_Request'
   inputs:
     azureSubscription: 'GSPipelines'
     ScriptType: 'InlineScript'
@@ -32,18 +33,19 @@ steps:
     azurePowerShellVersion : LatestVersion
 
 
-#- task: AzurePowerShell@5
-#  inputs:
-#    azureSubscription: 'GSPipelines'
-#    ScriptType: 'InlineScript'
-#    Inline: |
-#      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0)
-#      $secret = Get-AzKeyVaultSecret -VaultName $vaultName -Name $cert.Name -AsPlainText
-#      $secretByte = [Convert]::FromBase64String($secret)
-#      # Write to a file
-#      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
-#    azurePowerShellVersion: 'LatestVersion'
-#    workingDirectory: $(Build.ArtifactStagingDirectory)
+- task: AzurePowerShell@5
+  name: 'Getting_PFX_File'
+  inputs:
+    azureSubscription: 'GSPipelines'
+    ScriptType: 'InlineScript'
+    Inline: |
+      do{$cert = Get-AzKeyVaultCertificate -VaultName ${{parameters.Keyvault}} -Name ${{parameters.Cert_DNS_Name}}}while($cert.length -eq 0)
+      $secret = Get-AzKeyVaultSecret -VaultName $vaultName -Name $cert.Name -AsPlainText
+      $secretByte = [Convert]::FromBase64String($secret)
+      # Write to a file
+      [System.IO.File]::WriteAllBytes("$($cert.Name).pfx", $secretByte)
+    azurePowerShellVersion: 'LatestVersion'
+    workingDirectory: $(Build.ArtifactStagingDirectory)
 
 # certreq.exe -submit -attrib "CertificateTemplate:SubCA" -config "https://btbjuqpcww3ehai1oozluine0g.fx.internal.cloudapp.net\allthecerts-CA-Sign-Test-CA" -q certsignrequest.csr signedrequest.cer
 # Invoke-AzVmRunCommand -ResourceGroupName "Cert-KeyManagement" -VMName "CA-Sign-Test" -CommandId "RunPowerShellScript" -ScriptPath "C:\Windows\System32\certreq.exe" -Parameter @{ -submit ; -attrib "CertificateTemplate:SubCA" ;  -config CA-Sign-Test\allthecerts-CA-Sign-Test-CA ; -q ; certsignrequest.csr ; signedrequest.cer }
