@@ -31,7 +31,7 @@ parameters:
     pathToPublish: '$(Build.ArtifactStagingDirectory)' 
     artifactName: 'Certificate' 
     publishLocation: 'Container'
-
+  displayName: 'publishCertificateForDevCheck'
 
 
 
