@@ -9,7 +9,7 @@ parameters:
   - name: Keyvault
     default: 'EnterKeyvaultNameHere'
 
-
+steps:
 - task: AzurePowerShell@5
   name: 'Getting_PFX_File'
   inputs:
