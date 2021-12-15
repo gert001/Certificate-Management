@@ -25,7 +25,6 @@ steps:
     workingDirectory: $(Build.ArtifactStagingDirectory)
     azurePowerShellVersion : LatestVersion
 
-  displayName: 'Run a one-line script'
 
 
 
